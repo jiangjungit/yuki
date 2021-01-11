@@ -1,0 +1,42 @@
+﻿#ifndef YUKI_UTIL
+#define YUKI_UTIL
+#include <iostream>
+#include <string>
+#include <ctime>
+
+#cmakedefine LINUX_OK_H
+#cmakedefine WIN_OK_H
+
+#ifdef WIN_OK_H
+#include <wchar.h>
+#include <windows.h>
+int set_color_cmd(DWORD &, const bool);
+#endif
+void clean_cin();
+std::string add_zero(const std::string &, const std::string::size_type);
+int check_dir(const std::string &);
+int make_direct(const std::string &);
+std::string remove_chars(const std::string &);
+std::string join_path(std::initializer_list<std::string>);
+// 不定参数量模板重载使之也适合C字符串
+template <typename... Ts>
+std::string join_path(Ts &&... paths)
+{
+    static_assert(((std::is_same<typename std::decay<Ts>::type, std::string>::value ||
+                    std::is_same<typename std::decay<Ts>::type, const char *>::value) ||
+                   ...),
+                  "T must be a basic_string");
+    return join_path({paths...});
+}
+std::string basename(const std::string &);
+int check_save_path(const std::string &);
+int check_str_id(const std::string &);
+int check_user_id(const std::string &);
+void now_time(unsigned &, unsigned &, unsigned &);
+int input_time(std::string &, std::string &);
+int format_time(unsigned &, unsigned &, unsigned &);
+int string_to_time(const std::string &, std::string &);
+int time_str(const unsigned, const unsigned, const unsigned, std::string &);
+int option_parse(int, char const *[], std::string &, std::string &, std::string &, std::string &);
+int option_input(std::string &, std::string &, std::string &, std::string &);
+#endif

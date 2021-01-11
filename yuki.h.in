@@ -1,0 +1,9 @@
+﻿#ifndef YUKI
+#define YUKI
+#define YUKI_VERSION_MAJOR @yuki_VERSION_MAJOR@
+#define YUKI_VERSION_MINOR @yuki_VERSION_MINOR@
+#define YUKI_VERSION_PATCH @yuki_VERSION_PATCH@
+#cmakedefine LINUX_OK_H
+#cmakedefine WIN_OK_H
+#cmakedefine DEBUG
+#endif

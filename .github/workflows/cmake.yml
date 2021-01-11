@@ -1,0 +1,85 @@
+name: CMake
+
+on: workflow_dispatch
+
+jobs:
+  build_Windows:
+    name: Build vcpkg on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: cache vcpkg curl
+        uses: actions/cache@v2
+        id: cache-primes
+        with:
+          path: ${{github.workspace}}/vcpkg
+          key: windows-build-
+
+      - name: vcpkg curl Windows
+        if: startsWith(runner.os, 'Windows') && steps.cache-primes.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.bat
+          ./vcpkg/vcpkg install curl[tool]:x64-windows-static
+          ./vcpkg/vcpkg integrate install
+          echo Installed vcpkg and Curl
+          
+      - name: Build Windows
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          cmake --build . --config Release
+          ls .
+          echo Built Yuki
+  
+      - name: yuki Windows
+        shell: bash
+        run: |
+          cd build
+          cd Release
+          ls .
+          ./yuki.exe -h
+  
+  build_Linux:
+    name: Build vcpkg on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: cache vcpkg curl
+        uses: actions/cache@v2
+        id: cache-primes
+        with:
+          path: ${{github.workspace}}/vcpkg
+          key: linux-build-
+
+      - name: vcpkg curl Linux
+        if: startsWith(runner.os, 'Linux') && steps.cache-primes.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/vcpkg install curl[tool]:x64-linux
+          ./vcpkg/vcpkg integrate install
+          echo Installed vcpkg and Curl
+      
+      - name: Build Linux
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux
+          cmake --build . --config Release
+          ls .
+          echo Built Yuki
+          
+      - name: yuki
+        shell: bash
+        run: |
+          cd build
+          ls .
+          ./yuki -h
